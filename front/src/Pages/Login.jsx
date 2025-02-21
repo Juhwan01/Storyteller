@@ -19,11 +19,16 @@ export default function Login() {
   }, []);
 
   const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
+      alert("아이디와 비밀번호를 입력하세요!");
+      return; // 요청 보내지 않음
+    }
+  
     try {
       const formData = new URLSearchParams();
       formData.append("username", username);
       formData.append("password", password);
-
+  
       const response = await axios.post(
         `${API_URL}/user/login`,
         formData,
@@ -31,17 +36,18 @@ export default function Login() {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-
+  
       const newToken = response.data.access_token;
-      localStorage.setItem("access_token", newToken); // ✅ 토큰 저장
-      setIsLoggedIn(true); // 로그인 성공 시 상태 변경
-
+      localStorage.setItem("access_token", newToken);
+      setIsLoggedIn(true);
+  
       console.log("로그인 성공:", response.data);
-      navigate("/"); // 홈 페이지로 이동
+      navigate("/");
     } catch (error) {
+      alert("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다.");
       console.error("로그인 실패:", error.response?.data || error.message);
     }
-  };
+  };  
 
   const handleLogout = () => {
     localStorage.removeItem("access_token"); // 토큰 삭제

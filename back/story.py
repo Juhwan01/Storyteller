@@ -5,7 +5,6 @@ from model import Location
 from security import get_current_user
 from dto import CheckLocationDTO
 from math import radians, cos, sin, sqrt, atan2
-from user import get_current_user
 
 router = APIRouter(
     prefix="/story",

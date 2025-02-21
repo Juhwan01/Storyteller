@@ -12,7 +12,6 @@ router = APIRouter(
 
 @router.post("/signup")
 def signup(user_data: AddUserDTO, db: Session = Depends(get_db)):
-    # 아이디 중복 검사...를 넣고 싶은데 .. 
     try:
         hashed_password = hash_password(user_data.password)
         new_user = User(
@@ -28,7 +27,7 @@ def signup(user_data: AddUserDTO, db: Session = Depends(get_db)):
         return {"error": f"Error adding user: {str(e)}"}
     
 @router.post("/login")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # 사용자 인증
     if authenticate_user(form_data.username, form_data.password):
         # 토큰 데이터 준비
