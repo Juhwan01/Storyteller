@@ -29,7 +29,7 @@ def signup(user_data: AddUserDTO, db: Session = Depends(get_db)):
 @router.post("/login")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # 사용자 인증
-    if authenticate_user(form_data.username, form_data.password):
+    if authenticate_user(form_data.username, form_data.password, db):
         # 토큰 데이터 준비
         token_data = {
             "sub": form_data.username,

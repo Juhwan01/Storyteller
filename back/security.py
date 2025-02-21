@@ -46,13 +46,15 @@ def create_access_token(data: dict):
     # JWT 토큰 생성
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-def authenticate_user(userid : str, password : str, db:Session=Depends(get_db)):
+    
+def authenticate_user(userid: str, password: str, db: Session):
     try:
         user = db.query(User).filter(User.userid == userid).first()
         if not user:
             return False
-        return verify_password(user.userpw,password)
+            
+        return verify_password(password, user.userpw)
     except Exception as e:
+        print(f"Exception occurred: {str(e)}")
         return {"error": str(e)}
     
