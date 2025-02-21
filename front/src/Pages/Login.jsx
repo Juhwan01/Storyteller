@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "http://localhost:8000"; // API URL 수정
+const API_URL = "http://13.209.64.66:8000"; // API URL 수정
 
 export default function Login() {
   const [username, setUsername] = useState("");

@@ -27,7 +27,7 @@ const Story = () => {
         }
 
         try {
-          const response = await fetch("http://localhost:8000/story/check-location", {
+          const response = await fetch("http://13.209.64.66:8000/story/check-location", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
