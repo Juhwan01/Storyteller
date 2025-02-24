@@ -14,7 +14,7 @@ export default function Signup() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${API_URL}/user/signup`,
+        `/api/user/signup`,
         { userid:username, nickname, password },
         { headers: { "Content-Type": "application/json" } } // JSON 형식 명시
       );
