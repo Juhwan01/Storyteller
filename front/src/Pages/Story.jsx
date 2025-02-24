@@ -39,7 +39,7 @@ const Story = () => {
           const data = await response.json();
           if (data.allowed) {
             setMessage("스토리를 작성할 수 있습니다!");
-            navigate("/storywrite");  // 스토리 작성 페이지로 이동
+            navigate("/Storywrite");  // 스토리 작성 페이지로 이동
           } else {
             setMessage("스토리 작성이 불가능한 위치입니다.");
           }

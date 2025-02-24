@@ -6,6 +6,7 @@ import Signup from './Pages/Signup'
 import Home from './Pages/home'
 import './App.css'
 import Story from './Pages/Story'
+import Storywrite from './Pages/Storywrite'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -18,6 +19,7 @@ function App() {
         <Route path="/story" element={<Story />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/storywrite" element={<Storywrite />} />
       </Routes>
     </Router>
   )
