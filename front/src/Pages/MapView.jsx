@@ -172,65 +172,72 @@ const MapView = () => {
 
   if (loading) {
     return (
-      <div className="map-loading">
-        <p>지도를 불러오는 중입니다...</p>
+      <div className="page-container">
+        <div className="loading-container fade-in">
+          <div className="loading-spinner"></div>
+          <p>지도를 불러오는 중입니다...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="map-error">
-        <p>{error}</p>
-        <button onClick={() => navigate("/story")}>
-          스토리 목록으로 돌아가기
-        </button>
+      <div className="page-container">
+        <div className="error-container fade-in">
+          <p className="error-message">{error}</p>
+          <button onClick={() => navigate("/story")}>
+            스토리 목록으로 돌아가기
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="map-container">
-      <h1>스토리 맵</h1>
+    <div className="page-container">
+      <div className="map-container fade-in">
+        <h1>스토리 맵</h1>
 
-      <div id="map" className="kakao-map"></div>
+        <div id="map" className="kakao-map"></div>
 
-      {selectedStory && (
-        <div className="story-detail-card">
-          <button className="close-btn" onClick={closeStoryDetail}>
-            ×
-          </button>
-          <h2>{selectedStory.title}</h2>
-          <p className="story-author">
-            작성자: {selectedStory.author_nickname}
-          </p>
-          <p className="story-date">
-            작성일: {new Date(selectedStory.created_at).toLocaleDateString()}
-          </p>
-          <div className="story-content">
-            <p>{selectedStory.content}</p>
-          </div>
-          <div className="story-actions">
-            <button
-              className="view-btn"
-              onClick={() => handleStoryClick(selectedStory.id)}
-            >
-              전체 보기
+        {selectedStory && (
+          <div className="story-detail-card">
+            <button className="close-btn" onClick={closeStoryDetail}>
+              ×
             </button>
-            <button
-              className="continue-btn"
-              onClick={() => handleCreateContinuationStory(selectedStory.id)}
-            >
-              이어쓰기
-            </button>
+            <h2>{selectedStory.title}</h2>
+            <p className="story-author">
+              작성자: {selectedStory.author_nickname}
+            </p>
+            <p className="story-date">
+              작성일: {new Date(selectedStory.created_at).toLocaleDateString()}
+            </p>
+            <div className="story-content">
+              <p>{selectedStory.content}</p>
+            </div>
+            <div className="story-actions">
+              <button
+                className="view-btn"
+                onClick={() => handleStoryClick(selectedStory.id)}
+              >
+                전체 보기
+              </button>
+              <button
+                className="continue-btn"
+                onClick={() => handleCreateContinuationStory(selectedStory.id)}
+              >
+                이어쓰기
+              </button>
+            </div>
           </div>
+        )}
+
+        <div className="map-controls">
+          <button onClick={() => navigate("/story")}>목록으로</button>
+          <button onClick={() => navigate("/storywrite")}>새 스토리</button>
+          <button onClick={getUserLocation}>내 위치로</button>
         </div>
-      )}
-
-      <div className="map-controls">
-        <button onClick={() => navigate("/story")}>목록으로</button>
-        <button onClick={() => navigate("/storywrite")}>새 스토리</button>
-        <button onClick={getUserLocation}>내 위치로</button>
       </div>
     </div>
   );
