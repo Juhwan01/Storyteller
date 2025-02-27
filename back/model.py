@@ -34,7 +34,8 @@ class Story(Base):
     content = Column(Text, nullable=False)  # 스토리 내용
     created_at = Column(DateTime, default=func.now())  # 스토리 작성 시간
     is_root = Column(Boolean, default=False)  # 장소의 시작 스토리인지 여부
-
+    title = Column(String, nullable=False)  # 스토리 제목 추가
+    
     # Relationships
     location = relationship("Location", back_populates="stories")  # 스토리가 연결된 장소
     author = relationship("User", back_populates="stories")  # 스토리를 작성한 사용자

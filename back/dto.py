@@ -15,7 +15,14 @@ class AddLocationDTO(BaseModel):
     name: str
     latitude: float
     longitude: float
+    description: str
 
 class CheckLocationDTO(BaseModel):
     latitude: float
     longitude: float
+
+class CreateStoryDTO(BaseModel):
+    title: str
+    content: str
+    location_id: int
+    parent_story_id: int
