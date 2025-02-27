@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 # 기준 오차 범위 (미터 단위)
-RANGE_LIMIT = 500  
+RANGE_LIMIT = 1000  
 
 # Haversine 공식을 사용하여 두 좌표 간 거리 계산 (단위: 미터)
 def haversine(lat1, lon1, lat2, lon2):
