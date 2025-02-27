@@ -1,14 +1,31 @@
+version: '3'
+
 services:
-  frontend:
-    build: 
-      context: ./front
+  # nginx 서비스 추가
+  nginx:
+    image: nginx:latest
     ports:
-      - "80:5173"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./cert.crt:/etc/nginx/cert.crt
+      - ./cert.key:/etc/nginx/cert.key
+    depends_on:
+      - frontend
+      - backend
+
+  # 프론트엔드 설정
+  frontend:
+    build:
+      context: ./front
+    expose:
+      - "5173"
     depends_on:
       - backend
 
+  # 백엔드 설정
   backend:
-    build: ./back
-    network_mode: "host"
-    ports:
-      - "8000:8000"
+    build:
+      context: ./back
+    expose:
+      - "8000"

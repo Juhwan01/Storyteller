@@ -30,7 +30,7 @@ export default function Login() {
       formData.append("password", password);
   
       const response = await axios.post(
-        `${API_URL}/user/login`,
+        `/api/user/login`,
         formData,
         {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
