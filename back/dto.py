@@ -25,4 +25,4 @@ class CreateStoryDTO(BaseModel):
     title: str
     content: str
     location_id: int
-    parent_story_id: int
+    parent_story_id: Optional[int] = None
