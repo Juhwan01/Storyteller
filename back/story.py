@@ -12,8 +12,8 @@ router = APIRouter(
     prefix="/story",
 )
 
-#거리 계산 관련
-RANGE_LIMIT = 3000  # 3km(3000m)
+# 거리 계산 관련 (1km 기준)
+RANGE_LIMIT = 1000  # 1km = 1000m
 
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371000  
@@ -24,13 +24,13 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
 
-#근처 3km 내의 '최초 스토리(is_root=True)' 조회 API 
+# 근처 1km 내의 '최초 스토리(is_root=True)' 조회 API 
 @router.get("/nearby-root-stories")
 def get_nearby_root_stories(
     latitude: float,
     longitude: float,
     db: Session = Depends(get_db),
-    user: str = Depends(get_current_user), 
+    user: str = Depends(get_current_user),
 ):
     locations = db.query(Location).all()
     if not locations:
@@ -58,21 +58,21 @@ def get_nearby_root_stories(
 
     if not root_stories:
         return {
-            "message": "반경 3km 내에 최초 스토리가 없습니다.",
+            "message": "반경 1km 내에 최초 스토리가 없습니다.",
             "stories": []
         }
 
     return {
-        "message": "반경 3km 내에 있는 최초 스토리 목록입니다.",
+        "message": "반경 1km 내에 있는 최초 스토리 목록입니다.",
         "stories": root_stories
     }
 
-#특정 장소의 스토리들 조회 API
+# 특정 장소의 스토리들 조회 API
 @router.get("/location-stories/{location_id}")
 def get_stories_by_location(
     location_id: int,
     db: Session = Depends(get_db),
-    user: str = Depends(get_current_user),  # 토큰 인증
+    user: str = Depends(get_current_user),
 ):
     location = db.query(Location).filter(Location.id == location_id).first()
     if not location:
@@ -104,7 +104,7 @@ def get_stories_by_location(
         "stories": story_list
     }
 
-#스토리 수정용 DTO + 수정 API 
+# 스토리 수정용 DTO + 수정 API 
 class UpdateStoryDTO(BaseModel):
     story_id: int
     update_content: str
@@ -119,30 +119,19 @@ def update_story(
     if not story_to_update:
         raise HTTPException(status_code=404, detail="해당 스토리가 존재하지 않습니다.")
 
-    # 최초 스토리는 수정 불가
-    if story_to_update.is_root:
-        raise HTTPException(status_code=403, detail="최초 스토리는 수정할 수 없습니다.")
-
-    # 작성자만 수정 가능하도록 체크
-    user_obj = db.query(User).filter(User.userid == current_user).first()
-    if not user_obj:
-        raise HTTPException(status_code=401, detail="유효하지 않은 사용자입니다.")
-    if story_to_update.user_id != user_obj.id:
-        raise HTTPException(status_code=403, detail="본인이 작성한 스토리가 아니면 수정할 수 없습니다.")
-
-    # 기존 내용에 덧붙이기
+    # 이어쓰기 방식: 기존 내용을 그대로 유지하고, 새 내용만 덧붙임
     story_to_update.content += f"\n{update_data.update_content}"
 
     db.commit()
     db.refresh(story_to_update)
 
     return {
-        "message": "스토리가 성공적으로 수정되었습니다.",
+        "message": "스토리가 성공적으로 업데이트되었습니다.",
         "story_id": story_to_update.id,
         "updated_content": story_to_update.content
     }
 
-#위치 체크 및 스토리 작성 API
+# 위치 체크 및 스토리 작성 API
 @router.post("/check-location")
 def check_story_location(
     location_data: CheckLocationDTO,
@@ -167,7 +156,6 @@ def check_story_location(
             min_distance = distance
             nearest_location = loc
 
-    # 기준 범위 내에 있는지 확인
     if nearest_location and min_distance <= RANGE_LIMIT:
         return {
             "allowed": True,
@@ -181,7 +169,7 @@ def check_story_location(
             "message": "스토리를 작성할 수 없습니다. 기준 위치에서 너무 멀리 있습니다."
         }
 
-#스토리 작성 API 
+# 스토리 작성 API 
 @router.post("/Story_writing")
 def create_story(
     story_data: CreateStoryDTO,
@@ -205,20 +193,21 @@ def create_story(
         if parent_story.location_id != story_data.location_id:
             raise HTTPException(status_code=400, detail="부모 스토리는 같은 장소에서 작성된 글이어야 합니다.")
 
-    # 최초 스토리 확인 로직 추가
-    is_root = False
+    # 해당 위치에 이미 스토리가 존재하면 새로 생성하지 않음 (이어쓰기는 PUT /update-story로 진행)
     existing_stories = db.query(Story).filter(Story.location_id == story_data.location_id).count()
-    if existing_stories == 0:
-        is_root = True
+    if existing_stories > 0:
+        raise HTTPException(
+            status_code=400,
+            detail="해당 위치에 이미 스토리가 존재합니다. 이어서 업데이트하려면 PUT /update-story를 이용해주세요."
+        )
 
-    # 새로운 스토리 저장
     new_story = Story(
         title=story_data.title,
         content=story_data.content,
         user_id=user_data.id,
         location_id=story_data.location_id,
         parent_story_id=story_data.parent_story_id,
-        is_root=is_root  # 해당 위치의 첫 스토리인 경우 is_root=True
+        is_root=True  # 해당 위치의 첫 스토리
     )
 
     db.add(new_story)
